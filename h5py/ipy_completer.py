@@ -41,7 +41,11 @@
 
 import posixpath
 import re
-import readline
+try:
+    import readline
+except ImportError:
+    readline = None
+from warnings import warn
 from ._hl.attrs import AttributeManager
 from ._hl.base import HLObject
 
@@ -188,6 +192,9 @@ def h5py_completer(self, event):
 
 def load_ipython_extension(ip=None):
     """ Load completer function into IPython """
-    if ip is None:
-        ip = get_ipython()
-    ip.set_hook('complete_command', h5py_completer, re_key=r"(?:.*\=)?(.+?)\[")
+    if readline:
+        if ip is None:
+            ip = get_ipython()
+        ip.set_hook('complete_command', h5py_completer, re_key=r"(?:.*\=)?(.+?)\[")
+    else:
+        warn("Readline is not available to enable completions.")
